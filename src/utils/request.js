@@ -9,7 +9,7 @@ const BASEURL =  process.env.NODE_ENV === 'production'?'':'/devApi';
 
 const service = axios.create({
     baseURL:BASEURL, //http://192.168.31.47:8080/devApi => http://www.web-jshtml.cn/productapi
-    timeout:1000
+    timeout:15000 //超时时间
    
 });
 
