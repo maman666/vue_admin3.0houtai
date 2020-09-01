@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { GetSms,Register } from "@/api/login.js";
+import { GetSms, Register, Login } from "@/api/login.js";
 import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
 import {
   stripscript,
@@ -85,7 +85,7 @@ import {
   validatePass,
   validateVcode
 } from "@/utils/validate.js";
-import { setTimeout, setInterval, clearInterval } from "timers";
+
 export default {
   name: "Login3.0",
   setup(props, { refs, root }) {
@@ -195,13 +195,14 @@ export default {
       model.value = data.type;
       //重置表单内容
       refs["loginForm"].resetFields();
-      //点击切换的时候重置一下验证码内容 注册和登录的禁用按钮
-      codeButtonStatus.text = '获取验证码';
+      //点击切换的时候重置一下验证码内容 停止倒计时
+      clearCountDown();
+      //注册和登录的禁用按钮
       loginButtonStatus.value = true;
 
     };
 
-    //获取验证码
+    //获取验证码----------------------------------------------------------------
     const getSms = () => {
       //1111111@qq.com 获取验证码一个账号
       if (ruleForm.username == "") {
@@ -221,45 +222,70 @@ export default {
         username: ruleForm.username,
         module: model.value
       };
-
-      setTimeout(() => {
-        GetSms(data)
-          .then(response => {
-            let res = response.data;
-            root.$message({
-              message: res.message,
-              type: "success"
-            });
-            //发送成功后启用登录或者注册按钮
-            loginButtonStatus.value = false;
-            //请求成功 开始倒计时
-            countDown(10);
-          })
-          .catch(error => {
-            console.log(error);
+      //验证码接口
+      GetSms(data)
+        .then(response => {
+          let res = response.data;
+          root.$message({
+            message: res.message,
+            type: "success"
           });
-      }, 3000);
+          //发送成功后启用登录或者注册按钮
+          loginButtonStatus.value = false;
+          //请求成功 开始倒计时
+          countDown(60);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     };
 
-    //提交表单
+    //提交表单---------------------------------------------------------------------
     const submitForm = formName => {
+      // console.log(model.value);
       refs[formName].validate(valid => {
         if (valid) {
-          let requestData = {
-            username:ruleForm.username,
-            password:ruleForm.password,
-            code:ruleForm.code,
-            module:model.value
-          }
-          Register(requestData).then(response=>{
-            let res = response.data;
+          if (model.value == "login") {
+            let requestData = {
+              username: ruleForm.username,
+              password: ruleForm.password,
+              code: ruleForm.code
+            };
+            //登录接口
+            Login(requestData).then(response => {
+              let res = response.data;
+                root.$message({
+                  message: res.message,
+                  type: "success"
+                });
+            });
+          } else if (model.value == "register") {
+            let requestData = {
+              username: ruleForm.username,
+              password: ruleForm.password,
+              code: ruleForm.code,
+              module: model.value
+            };
+            //注册接口
+            Register(requestData)
+              .then(response => {
+                let res = response.data;
+                root.$message({
+                  message: res.message,
+                  type: "success"
+                });
+                //注册成功跳转到登录页面
+                toggleMenu(menuTab[0]);
+                //清除定时器 恢复默认状态
+                clearCountDown();
+              })
+              .catch(error => {});
+          } else {
             root.$message({
               message: res.message,
-              type: "success"
+              type: "error"
             });
-          }).catch(error=>{
-
-          })
+          }
         } else {
           console.log("error submit!!");
           return false;
@@ -268,19 +294,31 @@ export default {
     };
 
     //倒计时 方法
-    const countDown = (number)=>{
+    const countDown = number => {
+      //开始的时候判断定时器是否存在，把他清除掉 不然会累加
+      if (timer.value) {
+        clearInterval(timer.value);
+      }
       var time = number;
-      timer.value = setInterval(()=>{
+      timer.value = setInterval(() => {
         time--;
-        if(time===0){
+        if (time === 0) {
           clearInterval(timer.value);
           codeButtonStatus.status = false;
           codeButtonStatus.text = "再次获取";
-        }else{
-          codeButtonStatus.text = `倒计时${time}秒`
+        } else {
+          codeButtonStatus.text = `倒计时${time}秒`;
         }
-      },1000)
-    }
+      }, 1000);
+    };
+
+    //清除倒计时
+    const clearCountDown = () => {
+      //清除定时器
+      clearInterval(timer.value);
+      codeButtonStatus.status = false;
+      codeButtonStatus.text = "获取验证码";
+    };
     // 生命周期 挂载完成后
     onMounted(() => {});
     return {
