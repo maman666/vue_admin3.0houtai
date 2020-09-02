@@ -18,6 +18,15 @@ const service = axios.create({
 // 添加请求拦截器
 service.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么
+    //后台需要一些什么东西（Token userId cookies 也就是在请求头加参数）
+  
+    //业务需求
+
+
+    //最终目的 在请求头添加参数
+    config.headers['Tonkey'] = '11111'
+
+    console.log(config.headers)
     return config;
   }, function (error) {
     // 对请求错误做些什么
@@ -26,9 +35,9 @@ service.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 service.interceptors.response.use(function (response) {
-    // 对响应数据做点什么
+    // 对响应数据做点什么 做业务需求
     let data = response.data;
-    //对响应的状态做一下判断
+    //对响应的状态做一下判断 
     if(data.resCode!==0){
         Message.error(data.message);
         return Promise.reject(data);

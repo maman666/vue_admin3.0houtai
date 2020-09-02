@@ -77,6 +77,7 @@
 </template>
 
 <script>
+import sha1 from "js-sha1";
 import { GetSms, Register, Login } from "@/api/login.js";
 import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
 import {
@@ -173,7 +174,7 @@ export default {
     });
     //表单绑定数据
     const ruleForm = reactive({
-      username: "",
+      username: "maman@qq.com",
       password: "",
       passwords: "",
       code: ""
@@ -187,6 +188,11 @@ export default {
     });
 
     //声明函数
+    //切换模块
+    /**
+     * 建议不要再同一个方法做不同的事件（尽可能做自己的事，不要做其他的功能，其他的功能可以另外声明一个函数，在这里调用这个方法）
+     * 尽量把相同的事情封装在一个方法里面，调用这个方法就可以
+     */
     const toggleMenu = data => {
       // console.log(data)
       menuTab.forEach(item => (item.current = false));
@@ -202,6 +208,12 @@ export default {
 
     };
 
+    //更新按钮状态（多个地方调用 封装成一个函数以传参的形式调用 建议一般用对象）
+    const updateButtonStatus = (params)=>{
+      codeButtonStatus.status = params.status;
+      codeButtonStatus.text = params.text;
+    }
+
     //获取验证码----------------------------------------------------------------
     const getSms = () => {
       //1111111@qq.com 获取验证码一个账号
@@ -215,8 +227,11 @@ export default {
         return false;
       }
       //点击修改验证码的状态 内容
-      codeButtonStatus.status = true;
-      codeButtonStatus.text = "发送中...";
+      updateButtonStatus({
+        status:true,
+        text:'发送中...'
+      })
+   
 
       let data = {
         username: ruleForm.username,
@@ -248,7 +263,7 @@ export default {
           if (model.value == "login") {
             let requestData = {
               username: ruleForm.username,
-              password: ruleForm.password,
+              password: sha1(ruleForm.password),
               code: ruleForm.code
             };
             //登录接口
@@ -262,7 +277,7 @@ export default {
           } else if (model.value == "register") {
             let requestData = {
               username: ruleForm.username,
-              password: ruleForm.password,
+              password: sha1(ruleForm.password),
               code: ruleForm.code,
               module: model.value
             };
@@ -304,8 +319,11 @@ export default {
         time--;
         if (time === 0) {
           clearInterval(timer.value);
-          codeButtonStatus.status = false;
-          codeButtonStatus.text = "再次获取";
+          updateButtonStatus({
+            status:false,
+            text:'再次获取'
+          })
+          
         } else {
           codeButtonStatus.text = `倒计时${time}秒`;
         }
@@ -316,8 +334,10 @@ export default {
     const clearCountDown = () => {
       //清除定时器
       clearInterval(timer.value);
-      codeButtonStatus.status = false;
-      codeButtonStatus.text = "获取验证码";
+      updateButtonStatus({
+        status:false,
+        text:"获取验证码"
+      })
     };
     // 生命周期 挂载完成后
     onMounted(() => {});
