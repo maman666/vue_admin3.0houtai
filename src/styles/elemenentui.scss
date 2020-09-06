@@ -1,0 +1,16 @@
+/*
+    修改elementui样式
+*/
+.el-submenu .el-menu-item{
+    font-size: 14px;
+    padding-left: 50px !important;
+    &.is-active{background-color:rgba(245,108,108,.2) !important;}
+}
+
+//修改一级菜单的样式 &当前标签满足的样式条件（动态可变的） 空格 .类名（当前标签的子标签）
+li.el-submenu{
+    &.is-active.is-opened .el-submenu__title{
+        background-color:$mainColor !important;
+    }
+}
+

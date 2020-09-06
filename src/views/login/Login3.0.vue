@@ -273,6 +273,9 @@ export default {
                   message: res.message,
                   type: "success"
                 });
+                root.$router.push({
+                  name:'Console'
+                })
             });
           } else if (model.value == "register") {
             let requestData = {
