@@ -32,7 +32,8 @@ const routes = [
     name:"Console",
     redirect:'consolemain', //路由重定向
     meta:{
-      name:"控制台"
+      name:"控制台",
+      icon:"console"
     },
     component:Layout,
     //二级路由 看看他显示在哪个区域 <router-view></router-view>
@@ -54,7 +55,8 @@ const routes = [
     path:"/info",
     name:"Info",
     meta:{
-      name:"信息管理"
+      name:"信息管理",
+      icon:"info"
     },
     component:Layout,
     //二级路由 看看他显示在哪个区域 <router-view></router-view>
@@ -85,7 +87,8 @@ const routes = [
     path:"/user",
     name:"User",
     meta:{
-      name:"用户管理"
+      name:"用户管理",
+      icon:"user"
     },
     component:Layout,
     //二级路由 看看他显示在哪个区域 <router-view></router-view>

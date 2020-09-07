@@ -1,5 +1,6 @@
 <template>
   <div id="nav-wrap">
+    <svg-icon iconClass="Vue" className="Vue"></svg-icon>
     <el-menu
       default-active="1-4-1"
       class="el-menu-vertical-demo"
@@ -16,7 +17,7 @@
         <el-submenu v-if="!item.hidden" :key="item.id" :index="index+''">
           <!-- 一级菜单 -->
           <template slot="title">
-            <i class="el-icon-location"></i>
+             <svg-icon :iconClass="item.meta.icon" :className="item.meta.icon"></svg-icon>
             <span slot="title">{{item.meta.name}}</span>
           </template>
           <!-- 子级菜单 -->
@@ -28,7 +29,7 @@
         </el-submenu>
       </template>
     </el-menu>
-    <svg-icon iconClass="150" className="menu"></svg-icon>
+   
   </div>
 </template>
 
@@ -73,5 +74,22 @@ export default {
   width: $navMenu;
   height: 100vh;
   background-color: #344a5f;
+  svg{
+    font-size: 20px;
+    margin-right: 10px;
+  }
+  .svg-icon.info{
+    fill:currentColor;
+    color: #fff ;
+    font-size: 20px;
+  }
+  .svg-icon.Vue{
+    font-size: 92px;
+    text-align: center;
+    margin: 28px 0 25px 68px;
+  }
+}
+.el-menu-vertical-demo.el-menu{
+  border-right: none;
 }
 </style>

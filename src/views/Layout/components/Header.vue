@@ -1,23 +1,61 @@
 <template>
-    <div id="header-wrap"></div>
+  <div id="header-wrap">
+    <div class="pull-left header-icon">
+      <svg-icon iconClass="menu" class="menu"></svg-icon>
+    </div>
+    <div class="pull-right header-icon">
+      <div class="user-info pull-left">管理员</div>
+      <svg-icon iconClass="exit" class="exit"></svg-icon>
+    </div>
+  </div>
 </template>
 
 <script>
-import '../../../styles/config.scss';
-export default {
-    
-}
+import "../../../styles/config.scss";
+export default {};
 </script>
 
 <style lang="scss" scoped>
-#header-wrap{
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: $navMenu;
-    height: 75px;
-    background-color:#fff;
-    box-shadow:0 3px 16px 0 rgba(0,0,0,.1);
-    -webkit-box-shadow:0 3px 16px 0 rgba(0,0,0,.1);
+#header-wrap {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: $navMenu;
+  height: 75px;
+  background-color: #fff;
+  line-height: 75px;
+  box-shadow: 0 3px 16px 0 rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 3px 16px 0 rgba(0, 0, 0, 0.1);
+  .pull-left {
+    float: left;
+  }
+  .pull-right {
+    float: right;
+  }
+}
+.header-icon {
+  padding: 0 32px;
+  svg {
+    fill: currentColor;
+    color: #000;
+    font-size: 25px;
+    margin-bottom: -8px;
+    cursor: pointer;
+  }
+}
+.pull-right.header-icon {
+  padding: 0;
+  .user-info.pull-left{
+      font-size: 14px;
+  }
+  .svg-icon.exit {
+    padding: 0 32px;
+  }
+}
+
+.user-info {
+  height: 100%;
+  padding: 0 32px;
+  border-right: 1px solid #ededed;
 }
 </style>
