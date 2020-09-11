@@ -277,6 +277,18 @@ export default {
                   name:'Console'
                 })
             });
+
+            //登录接口 action异步请求写法
+            // root.$store.dispatch('login',requestData).then(response => {
+            //   let res = response.data;
+            //     root.$message({
+            //       message: res.message,
+            //       type: "success"
+            //     });
+            //     root.$router.push({
+            //       name:'Console'
+            //     })
+            // });
           } else if (model.value == "register") {
             let requestData = {
               username: ruleForm.username,

@@ -1,11 +1,9 @@
 <template>
   <div id="nav-wrap">
-    <svg-icon iconClass="Vue" className="Vue"></svg-icon>
+    <svg-icon  iconClass="Vue" className="Vue"></svg-icon>
     <el-menu
       default-active="1-4-1"
       class="el-menu-vertical-demo"
-      @open="handleOpen"
-      @close="handleClose"
       :collapse="isCollapse"
       background-color="transparent"
       text-color="#fff"
@@ -35,7 +33,7 @@
 
 <script>
 import "../../../styles/config.scss";
-import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
+import { reactive, ref, isRef, toRefs, onMounted,computed } from "@vue/composition-api";
 export default {
   name: "navMenu",
   setup(props, { root }) {
@@ -43,23 +41,23 @@ export default {
      * data数据
      */
     //控制导航的展开和收缩
-    const isCollapse = ref(false);
+    // const isCollapse = ref(false);
     //拿到路由的配置
     const routers = reactive(root.$router.options.routes);
-    console.log(routers);
+    // console.log(routers);
+    /** 
+     * computed监听
+    */
+   //菜单栏展开和收缩
+   const isCollapse = computed(()=>{
+     return root.$store.state.isCollapse
+   })
     /***
      * 函数
      */
-    const handleOpen = (key, keyPath) => {
-      console.log(key, keyPath);
-    };
-    const handleClose = (key, keyPath) => {
-      console.log(key, keyPath);
-    };
+   
     return {
       isCollapse,
-      handleOpen,
-      handleClose,
       routers
     };
   }
@@ -71,9 +69,10 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  width: $navMenu;
+  // width: $navMenu;
   height: 100vh;
   background-color: #344a5f;
+  @include webkit(transition,all .3s ease 0s);
   svg{
     font-size: 20px;
     margin-right: 10px;
@@ -87,7 +86,18 @@ export default {
     font-size: 92px;
     text-align: center;
     margin: 28px 0 25px 68px;
+    @include webkit(transition,all .3s ease 0s);
   }
+}
+.open{
+  #nav-wrap{width:$navMenu;}
+}
+.close{
+    #nav-wrap{width:64px;}
+    #nav-wrap .svg-icon.Vue{
+      font-size:50px;
+      margin:25px 10px 25px 5px;
+    }
 }
 .el-menu-vertical-demo.el-menu{
   border-right: none;

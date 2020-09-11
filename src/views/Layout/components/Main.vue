@@ -19,13 +19,20 @@ export default {
     height: 100vh;
     position: fixed;
     top: 75px;
-    left: $navMenu;
+    // left: $navMenu;
     right: 0;
     bottom: 0;
     border: 30px solid #f7f7f7;
     border-bottom: none;
-    box-sizing:border-box;
-    -webkit-box-sizing: border-box;
+    // box-sizing:border-box;
+    // -webkit-box-sizing: border-box;
+    @include webkit(box-sizing, border-box);
+}
+.open{
+  #main-wrap{left:$navMenu;}
+}
+.close{
+  #main-wrap{left:64px;}
 }
 .main-content{
     width: 100%;
