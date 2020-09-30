@@ -50,7 +50,7 @@ export default {
     */
    //菜单栏展开和收缩
    const isCollapse = computed(()=>{
-     return root.$store.state.isCollapse
+     return root.$store.state.app.isCollapse
    })
     /***
      * 函数

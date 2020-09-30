@@ -18,7 +18,7 @@ export default {
   name:"headerNav",
   setup(props,{root}){
     const navMenuState = ()=>{
-      root.$store.commit('SET_COLLAPSE');
+      root.$store.commit('app/SET_COLLAPSE');
     }
     return {
       navMenuState

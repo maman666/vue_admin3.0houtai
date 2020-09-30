@@ -25,7 +25,7 @@ export default {
         /** 
          * 监听菜单的展开和收缩 决定往里面推 还是往外面展开
         */
-       const menuStatus = computed(()=>root.$store.state.isCollapse);
+       const menuStatus = computed(()=>root.$store.state.app.isCollapse);
       
        return {
            menuStatus
