@@ -48,7 +48,7 @@ export default {
     /** 
      * computed监听
     */
-   //菜单栏展开和收缩
+   //菜单栏展开和收缩 computed监听值的变化
    const isCollapse = computed(()=>{
      return root.$store.state.app.isCollapse
    })

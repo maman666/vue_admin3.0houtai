@@ -5,23 +5,48 @@
       <a href="javascript:;" @click="navMenuState"><svg-icon iconClass="menu" class="menu" ></svg-icon></a>
     </div>
     <div class="pull-right header-icon">
-      <div class="user-info pull-left">管理员</div>
-      <svg-icon iconClass="exit" class="exit"></svg-icon>
+      <div class="user-info pull-left">管理员{{username}}</div>
+      <svg-icon iconClass="exit" class="exit" @click.native="exit"></svg-icon>
     </div>
   </div>
 </template>
 
 <script>
 import "../../../styles/config.scss";
-import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
+import { reactive, ref, computed} from "@vue/composition-api";
 export default {
   name:"headerNav",
   setup(props,{root}){
+    //监听store username的值
+    const username = computed(()=>root.$store.state.app.username);
+
+    //点击菜单按钮触发store app/SET_COLLAPSE下的办法
     const navMenuState = ()=>{
       root.$store.commit('app/SET_COLLAPSE');
     }
+    //点击退出
+    const exit = ()=>{
+      root.$confirm('是否退出控制台', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          // type: 'warning'
+        }).then(() => {
+          root.$store.dispatch('app/exit').then(()=>{
+          root.$router.push({
+            name:'Login'
+          })
+        })
+          root.$message({
+            type: 'success',
+            message: '退出成功'
+          });
+        })
+    }
+    
     return {
-      navMenuState
+      navMenuState,
+      username,
+      exit
     }
   }
 };
