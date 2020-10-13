@@ -1,0 +1,15 @@
+//后台框架尺寸
+//菜单的宽度
+$navMenu:250px;
+//主颜色
+$mainColor:#f56c6c;
+$layoutHeader:75px;
+
+//各个浏览器兼容
+@mixin webkit($type,$value) {
+    -webkit-#{$type}:$value;
+    -moz-#{$type}:$value;
+    -o-#{$type}:$value;
+    -ms-#{$type}:$value;
+    #{$type}:$value;
+}
