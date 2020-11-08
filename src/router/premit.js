@@ -30,9 +30,9 @@ router.beforeEach((to,from,next)=>{
 
     }else{
         if(whiteRouter.indexOf(to.path) !== -1){
-            next(); //to 不带参数指向to 不带参数的情况下不会触发beforeEach
+            next(); //to 不带参数指向to 不带参数的情况下不会触发beforeEach 最后还是会走这里
         }else{
-            next('/login')
+            next('/login');//带参数就会触发beforeEach 路由守卫
         }
     }
     // console.log('to:',to)//进入的页面（进入到当前的页面）

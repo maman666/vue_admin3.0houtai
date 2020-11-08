@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {Message} from 'element-ui'
+import {getToken,getUsername} from '@/utils/app'
 
 //创建axios 赋值给service
 
@@ -24,9 +25,9 @@ service.interceptors.request.use(function (config) {
 
 
     //最终目的 在请求头添加参数
-    config.headers['Tonkey'] = '11111'
+    config.headers['Tokey'] = getToken() || ''
+    config.headers['UserName'] = getUsername() || ''
 
-    console.log(config.headers)
     return config;
   }, function (error) {
     // 对请求错误做些什么

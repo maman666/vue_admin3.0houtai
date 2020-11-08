@@ -32,3 +32,31 @@ li.el-submenu{
     }
 }
 
+// table样式
+div.el-table{
+    td,th{text-align: center;}
+    th{
+        font-weight: bold;
+        color: #344a5f;
+    }
+    td{font-size: 14px;}
+}
+
+//dialog样式
+.el-dialog__body{
+    padding: 30px 47px !important;
+}
+.el-dialog__footer{
+    text-align: center !important;
+    padding-bottom: 50px !important;
+    .el-button{
+        width:150px;
+        margin:0 11px;
+    }
+}
+//处理form弹窗margin-bottom
+.el-form{
+    .el-form-item:last-child{
+        margin-bottom: 0 !important;
+    }
+}

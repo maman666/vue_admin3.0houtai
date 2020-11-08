@@ -240,6 +240,7 @@ export default {
       //验证码接口
       GetSms(data)
         .then(response => {
+          console.log('response:',response)
           let res = response.data;
           root.$message({
             message: res.message,
