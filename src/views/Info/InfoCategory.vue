@@ -18,7 +18,7 @@
                     round
                     @click="editCategory({data:firstItem,type:'category_first_edit'})"
                   >编辑</el-button>
-                  <el-button size="mini" type="success" round>添加子级</el-button>
+                  <el-button size="mini" type="success" round @click="handleAddChildren({data:firstItem,type:'category_children_add'})">添加子级</el-button>
                   <el-button size="mini" round @click="deleteCategoryConfirm(firstItem.id)">删除</el-button>
                 </div>
               </h4>
@@ -65,7 +65,8 @@ import {
   AddFirstCategory,
   GetCategory,
   DeleteCategory,
-  EditCategory
+  EditCategory,
+  AddChildrenCategory
 } from "@/api/news";
 import { global } from "@/utils/global_V3.0";
 import { common } from "@/api/common";
@@ -75,7 +76,7 @@ export default {
     //global 弹框提醒 vue3.0写法
     const { confirm } = global();
     //获取分类接口全局组件引入
-    const {getInfoCategory,categoryItem} = common();
+    const {getInfoCategory,categoryItem,getInfoCategoryAll} = common();
     /**
      * reactive
      */
@@ -106,11 +107,17 @@ export default {
      * methods vue2.0
      */
     const submit = () => {
+      //判断的类型为添加一级分类添加
       if (submit_button_type.value == "category_first_add") {
         addFirstCategory();
       }
+      //判断的类型为添加一级分类编辑
       if (submit_button_type.value == "category_first_edit") {
         editFirstCategory();
+      }
+      //判断的类型为二级分类添加
+      if (submit_button_type.value == "category_children_add") {
+        addChildrenCategory();
       }
     };
     //添加一级分类的方法封装
@@ -146,6 +153,7 @@ export default {
           form.categoryName = "";
         });
     };
+    
     //添加一级分类
     const addFirst = params => {
       //按钮的类型区别
@@ -155,6 +163,51 @@ export default {
       category_first_disabled.value = false;
       category_button_disabled.value = false;
     };
+    //添加二级分类的方法封装
+    const addChildrenCategory = ()=>{
+      if(!form.secCategoryName){
+        root.$message({
+          message:'子级分类名称不能为空！！',
+          type:'error'
+        })
+        return false;
+      }
+      let resquestData = {
+        categoryName:form.secCategoryName,
+        parentId:category.current.id
+      }
+      AddChildrenCategory(resquestData).then(response=>{
+        let resquestData = response.data;
+        root.$message({
+          message:resquestData.message,
+          type:'success'
+        })
+        //调用获取信息分类接口（包含子级）
+        getInfoCategoryAll();
+        // 清空输入框
+        form.secCategoryName = '';
+      }).catch(error=>{
+        console.log(error)
+      })
+    }
+    //添加子级
+    const handleAddChildren = (params)=>{
+      //按钮的类型区别
+      submit_button_type.value = params.type;
+      //二级输入框打开
+      category_children_disabled.value = false;
+      //确定按钮打开
+      category_button_disabled.value = false;
+      //二级输入框显示
+      category_children_input.value = true;
+      //一级输入框禁用
+      category_first_disabled.value = true;
+      //存储数据
+      category.current = params.data;
+      console.log(category.current)
+      //显示一级分类文本
+      form.categoryName = category.current.category_name;
+    }
     //获取分类信息
     // const getCategory = () => {
     //   GetCategory({})
@@ -249,8 +302,10 @@ export default {
     onMounted(() => {
       //获取一级分类接口
       // getCategory();
-      //获取封装后全局组件一级信息分类
-      getInfoCategory();
+      //获取封装后全局组件一级信息分类（没有包含子级）
+      // getInfoCategory();
+      //获取封装后全局组件一级信息分类(包含子级)
+      getInfoCategoryAll()
     });
     return {
       //reactive
@@ -268,7 +323,9 @@ export default {
       submit,
       addFirst,
       deleteCategoryConfirm,
-      editCategory
+      editCategory,
+      handleAddChildren,
+      addChildrenCategory
     };
   }
 };

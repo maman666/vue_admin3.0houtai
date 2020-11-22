@@ -1,15 +1,15 @@
 <template>
   <div>
     <el-dialog
-      title="新增"
+      title="修改"
       :visible.sync="dialog_info_flag"
       @close="close"
       :modal="false"
       width="580px"
       @opened="openDialog"
     >
-      <el-form :model="form" ref="addInfoForm">
-        <el-form-item label="类别:" :label-width="formLabelWidth" prop="category">
+      <el-form :model="form">
+        <el-form-item label="类别:" :label-width="formLabelWidth">
           <el-select v-model="form.category" placeholder="请选择活动区域">
             <el-option
               v-for="item in categoryOption.item"
@@ -19,10 +19,10 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="标题:" :label-width="formLabelWidth" prop="title">
+        <el-form-item label="标题:" :label-width="formLabelWidth">
           <el-input v-model="form.title" placeholder="请输入标题"></el-input>
         </el-form-item>
-        <el-form-item label="概况:" :label-width="formLabelWidth" prop="content">
+        <el-form-item label="概况:" :label-width="formLabelWidth">
           <el-input type="textarea" v-model="form.content" placeholder="请输入内容"></el-input>
         </el-form-item>
       </el-form>
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { AddInfo } from "@/api/news";
+import { AddInfo,GetList,EditInfo} from "@/api/news";
 import { reactive, ref, watch } from "@vue/composition-api";
 export default {
   name: "dialogInfo",
@@ -48,6 +48,10 @@ export default {
     category: {
       type: Array,
       default: () => []
+    },
+    id: {
+      type: String,
+      default: ""
     }
   },
 
@@ -61,7 +65,7 @@ export default {
       }
     }
   },
-  setup(props, { root, emit, refs}) {
+  setup(props, { root, emit,refs}) {
     /** 
      * ref
     */
@@ -93,25 +97,44 @@ export default {
       emit("close", false); //回调的办法去触发父组件的事件,需要做逻辑性的东西
       //点击取消清空表单
       resetForm();
+      //清空编辑传过来的id
     };
     //打开弹窗后执行的办法
     const openDialog = () => {
-      console.log("props:", props.category);
+    //   console.log("props:", props.category);
       categoryOption.item = props.category;
+      //打开弹窗后获取信息列表 编辑内容
+      getInfo();
     };
+    const getInfo = ()=>{
+        //请求参数这两个参数时必须的，因为时编辑可以在在页面1，请求1条记录
+        let requestData = {
+            pageNumber: 1,
+            pageSize: 1,
+            id:props.id
+        }
+        GetList(requestData).then(response=>{
+            let responseData = response.data.data.data[0];
+            console.log(responseData)
+            //重新赋值
+                form.category = responseData.categoryId,
+                form.title = responseData.title,
+                form.content = responseData.content
+        }).catch(error=>{
+
+        })
+    }
     //清空表单内容
     const resetForm = ()=>{
-      // 用el方法清空表单 配置ref props
-     refs.addInfoForm.resetFields();
-      //传统的方法
-      // form.category = '';
-      // form.title = '';
-      // form.content = '';
+      form.category = '';
+      form.title = '';
+      form.content = '';
     }
     //点击确定调用的方法
     const submit = () => {
       // let date = new Date().getTime();
       let requestData = {
+        id:props.id,
         categoryId: form.category,
         title: form.title,
         content: form.content,
@@ -129,17 +152,22 @@ export default {
       }
       
       submitLoading.value = true;
-      AddInfo(requestData).then(response=>{
+      EditInfo(requestData).then(response=>{
         let data = response.data;
         root.$message({
           message:data.message,
           type:'success'
         })
         submitLoading.value = false;
-        //新增成功调用父组件的方法刷新数据
+        /** 
+         * 编辑成功 两种方法刷新数据
+         * 1.暴力性：调获取信息列表接口
+         * 2.手动修改数据
+        */
+       //编辑成功调用父组件的方法刷新数据
        emit('getListAddEdit');
-        //重置表单
-        resetForm();
+        //重置表单(编辑不需要)
+        // resetForm();
       }).catch(error=>{
         console.log(error);
         submitLoading.value = false;

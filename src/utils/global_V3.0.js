@@ -1,6 +1,6 @@
 
 import {MessageBox} from 'element-ui';
-import { reactive, ref ,watch} from "@vue/composition-api";
+import {  ref } from "@vue/composition-api";
 
 export function global(){
     const str = ref('');
