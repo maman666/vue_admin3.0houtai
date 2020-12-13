@@ -15,7 +15,7 @@ export function global(){
             //传一个函数过来处理数据
             //先判断函数在不在
             // if(params.fn){params.fn()}
-            params.fn && params.fn(params.id || '') //判断params.fn为true执行params.fn()这个办法 为false不执行
+            params.fn && params.fn(params || '') //判断params.fn为true执行params.fn()这个办法 为false不执行
         }).catch(() => {
             params.catchFn && params.catchFn()
             // root.$message({

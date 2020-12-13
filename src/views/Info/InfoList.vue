@@ -70,7 +70,13 @@
         <!-- 间距 -->
         <div class="black-space-30"></div>
         <!-- 表格 -->
-        <el-table :data="tableData.item" border="" style="width: 100%" v-loading="loadingData" @selection-change="handleSelectionChange">
+        <el-table
+            :data="tableData.item"
+            border=""
+            style="width: 100%"
+            v-loading="loadingData"
+            @selection-change="handleSelectionChange"
+        >
             <el-table-column type="selection" width="45"></el-table-column>
             <el-table-column prop="title" label="标题" width="830"></el-table-column>
             <el-table-column prop="categoryId" label="类型" width="130" :formatter="handleCategory"></el-table-column>
@@ -108,9 +114,20 @@
         <!-- 新增的弹窗 -->
         <!-- 修饰器去修改 -->
         <!-- <DialogInfo :flag.sync="dialog_info"></DialogInfo> -->
-        <DialogInfo :flag="dialog_info" @close="closeDialog" @getListAddEdit="getListAddEdit" :category="options.category"></DialogInfo>
+        <DialogInfo
+            :flag="dialog_info"
+            @close="closeDialog"
+            @getListAddEdit="getListAddEdit"
+            :category="options.category"
+        ></DialogInfo>
         <!-- 编辑弹窗 -->
-        <DialogEditInfo :flag="dialog_info_edit" @close="closeDialog" :id="infoId" @getListAddEdit="getListAddEdit" :category="options.category"></DialogEditInfo>
+        <DialogEditInfo
+            :flag="dialog_info_edit"
+            @close="closeDialog"
+            :id="infoId"
+            @getListAddEdit="getListAddEdit"
+            :category="options.category"
+        ></DialogEditInfo>
     </div>
 </template>
 
@@ -135,7 +152,7 @@ export default {
   setup(props, { root }) {
     //3.0全局组件弹窗的引入
     //str:aaa 重命名解决命名空间的问题
-      const {confirm} = global();
+    const { confirm } = global();
     //   watch(()=>console.log(aaa.value));
     /**
      * ref基础数据
@@ -152,8 +169,8 @@ export default {
     const search_keyWork = ref("");
     const total = ref(0);
     const loadingData = ref(false);
-    const deleteInfoId = ref('');
-    const infoId = ref('');
+    const deleteInfoId = ref("");
+    const infoId = ref("");
     /***
      * reactive对象数据
      */
@@ -198,106 +215,122 @@ export default {
       dialog_info_edit.value = false;
     };
     //父组件刷新列表数据
-    const getListAddEdit = ()=>{
-        getList();
-    }
+    const getListAddEdit = () => {
+      getList();
+    };
     //点击编辑
-    const editInfo = (id)=>{
-        dialog_info_edit.value = true;
-        infoId.value = id;
-    }
+    const editInfo = id => {
+      dialog_info_edit.value = true;
+      infoId.value = id;
+    };
     //格式化日期
     const handleTime = (row, column, cellValue, index) => {
       return formatTime(row.createDate);
     };
     //处理类型,把id转化为对应的文字
     const handleCategory = row => {
+      console.log("row", row);
       let categoryId = row.categoryId;
-      let categoryData = options.category.filter(
-        item => item.id == categoryId
-      )[0];
-      return categoryData.category_name;
+      //  let categoryIdNewArr  =  [...new Set(categoryIdArr)]
+      //  console.log('categoryIdNewArr:',categoryIdNewArr)
+      let categoryData = options.category.filter(item => {
+        return item.id == categoryId;
+      });
+
+      if(!categoryData[0]){
+          return null
+      }else{
+          return categoryData[0].category_name
+      }
+    //   console.log("categoryData:", categoryData[0]);
+    //   return categoryData[0].category_name;
     };
-    /** 
-     * 
+    /**
+     *
      * 删除记录 批量删除
-    */
-    const deleteItem = (id) => {
-        deleteInfoId.value = [id];
+     */
+    const deleteItem = id => {
+      deleteInfoId.value = [id];
       //3.0全局组件的办法
       confirm({
-          content:'确认删除此信息，删除后无法恢复！！',
-          tip:'警告',
-          fn:confirmDelete,
-          id:'maman666'
+        content: "确认删除此信息，删除后无法恢复！！",
+        tip: "警告",
+        fn: confirmDelete,
+        id: "maman666"
       });
       //注入Vue全局办法
-    //   root.confirm({
-    //     content: "确认删除此信息，删除后无法恢复！！",
-    //     tip: "警告",
-    //     fn: confirmDelete,
-    //     id: "maman666"
-    //   });
+      //   root.confirm({
+      //     content: "确认删除此信息，删除后无法恢复！！",
+      //     tip: "警告",
+      //     fn: confirmDelete,
+      //     id: "maman666"
+      //   });
     };
-   
+
     const deleteAll = () => {
-        if(!deleteInfoId.value || deleteInfoId.value.length ==0){
-            root.$message({
-                message:'请选择要删除的数据！！',
-                type:'error'
-            })
-            return;
-        }
+      if (!deleteInfoId.value || deleteInfoId.value.length == 0) {
+        root.$message({
+          message: "请选择要删除的数据！！",
+          type: "error"
+        });
+        return;
+      }
       confirm({
         content: "确认选中的数据，删除后无法恢复！！",
         type: "warning",
-        tip:'警告',
-        fn: confirmDelete,
+        tip: "警告",
+        fn: confirmDelete
       });
     };
     const confirmDelete = value => {
-      DeleteInfo({id:deleteInfoId.value}).then(response=>{
+      DeleteInfo({ id: deleteInfoId.value })
+        .then(response => {
           //删除成功把值清空（不然一直占内存）
-          deleteInfoId.value = '';
-         //删除成功调一下获取信息接口
-         getList();
-      }).catch(error=>{
-          console.log(error)
-      })
+          deleteInfoId.value = "";
+          //删除成功调一下获取信息接口
+          getList();
+        })
+        .catch(error => {
+          console.log(error);
+        });
     };
     //点击复选框触发的效果
-    const handleSelectionChange = val =>{
-        // val拿到数据
-        let id = val.map(item=>item.id);
-        deleteInfoId.value = id;
-    }
+    const handleSelectionChange = val => {
+      // val拿到数据
+      let id = val.map(item => item.id);
+      deleteInfoId.value = id;
+    };
     //点击搜索(模糊搜索)
-    const search = ()=>{
-        // console.log(categoryValue.value)
-        // console.log(dateValue.value)
-        // console.log(search_key.value)
-        // console.log(search_keyWork.value)
-        // console.log(formatData());
-        //获取列表信息
-         getList();
-    }
+    const search = () => {
+      // console.log(categoryValue.value)
+      // console.log(dateValue.value)
+      // console.log(search_key.value)
+      // console.log(search_keyWork.value)
+      // console.log(formatData());
+      //获取列表信息
+      getList();
+    };
     //搜索条件处理
-    const formatData = ()=>{
-        let requestData = {
-            pageNumber: page.pageNumber,
-            pageSize: page.pageSize
-        };
-        //分类id
-        if(categoryValue.value){requestData.categoryId = categoryValue.value};
-        //日期
-        if(dateValue.value.length>0){
-            requestData.startTiem = dateValue.value[0];
-            requestData.endTime = dateValue.value[1];
-        }
-        //关键字 根据id搜索 还是根据标题搜索
-        if(search_keyWork.value){requestData[search_key.value]=search_keyWork.value};
-        return requestData;
-    }
+    const formatData = () => {
+      let requestData = {
+        pageNumber: page.pageNumber,
+        pageSize: page.pageSize
+      };
+      //分类id
+      if (categoryValue.value) {
+        requestData.categoryId = categoryValue.value;
+      }
+      //日期
+      if (dateValue.value.length > 0) {
+        requestData.startTiem = dateValue.value[0];
+        requestData.endTime = dateValue.value[1];
+      }
+      //关键字 根据id搜索 还是根据标题搜索
+      if (search_keyWork.value) {
+        requestData[search_key.value] = search_keyWork.value;
+      }
+      return requestData;
+    };
     //获取列表数据
     const getList = () => {
       let requestData = formatData();
@@ -336,7 +369,7 @@ export default {
     watch(
       () => categoryItem.item,
       value => {
-        // console.log(value)
+        console.log("value:", value);
         options.category = value;
       }
     );

@@ -19,7 +19,7 @@
                     @click="editCategory({data:firstItem,type:'category_first_edit'})"
                   >编辑</el-button>
                   <el-button size="mini" type="success" round @click="handleAddChildren({data:firstItem,type:'category_children_add'})">添加子级</el-button>
-                  <el-button size="mini" round @click="deleteCategoryConfirm(firstItem.id)">删除</el-button>
+                  <el-button size="mini" round @click="deleteCategoryConfirm({type:1,deleteCategoryId:firstItem.id})">删除</el-button>
                 </div>
               </h4>
               <!-- 子极分类 -->
@@ -28,7 +28,7 @@
                   {{childrenItem.category_name}}
                   <div class="button-group">
                     <el-button size="mini" type="danger" round>编辑</el-button>
-                    <el-button size="mini" round>删除</el-button>
+                    <el-button size="mini" round @click="deleteCategoryConfirm({type:2,deleteCategoryId:childrenItem.id})">删除</el-button>
                   </div>
                 </li>
               </ul>
@@ -218,8 +218,8 @@ export default {
     //     .catch(error => {});
     // };
     //封装删除弹框 3.0封装
-    const deleteCategoryConfirm = categoryID => {
-      deleteId.value = categoryID;
+    const deleteCategoryConfirm = params => {
+      deleteId.value = params.deleteCategoryId;
       confirm({
         content: "确认删除此信息，删除后无法恢复！！",
         tip: "警告",
@@ -227,21 +227,33 @@ export default {
         catchFn: () => {
           deleteId.value = "";
         },
-        id: categoryID
+        //点击传过来的本身id
+        id: params.deleteCategoryId,
+        //判断删除的类型是父级还是子级
+        categoryType:params.type
       });
     };
     // 删除
-    const deleteCategory = categoryID => {
+    const deleteCategory = params => {
       // console.log('categoryId:',categoryId)
+      let categoryID = params.id;
+      let parentId = params.parentId;
       //删除接口
       DeleteCategory({ categoryId: categoryID })
         .then(response => {
-          // 1.es6 findIndex办法找到数组对应的索引
-          let categoryIndex = category.item.findIndex(
-            item => item.id == categoryID
-          );
-          //采用数组的splice办法删除数据 splice('起始的位置','删除的条数','插入或者替换')
-          category.item.splice(categoryIndex, 1);
+         if(params.categoryType===1){
+            // 1.es6 findIndex办法找到数组对应的索引
+            let categoryIndex = category.item.findIndex(
+              item => item.id == categoryID
+            );
+            //采用数组的splice办法删除数据 splice('起始的位置','删除的条数','插入或者替换')
+            category.item.splice(categoryIndex, 1);
+         }
+         if(params.categoryType===2){
+           //直接调接口
+           getInfoCategoryAll();
+          
+         }
           //2.数组过率的办法 选中id不相等的其他记录条数 在重新赋值
           // let newData = category.item.filter(item=>item.id!=categoryID)
           // category.item = newData;
