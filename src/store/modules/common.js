@@ -1,5 +1,11 @@
 
 import { GetCategory } from "@/api/news";
+const state = {
+    qiniuUrl : 'http://qmcwn2x0a.hn-bkt.clouddn.com/' //七牛云储存图片前缀地址(一个月失效)
+}
+const getters = {
+    qiniuUrl : state => state.qiniuUrl
+}
 const actions = {
     getCategoryInfo(content,requestData){
         return new Promise((resolve,reject)=>{
@@ -16,5 +22,7 @@ const actions = {
 
 export default {
     namespaced:true,
+    state,
+    getters,
     actions
 };

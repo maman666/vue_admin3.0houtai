@@ -76,6 +76,16 @@ const routes = [
           name:"信息分类"
         },
         component:()=>import("../views/Info/InfoCategory.vue") //局部区域显示的内容
+      },
+      {
+        // path:"/infoDetailed/:id/:title", //冒号的的形式传递传参 动态路由传参 (优势：页面刷新参数不会丢失，劣势：需要一一配置) 接受:params
+        path:"/infoDetailed",
+        name:"infoDetailed",
+        hidden:true,//自定义属性 控制显示隐藏
+        meta:{
+          name:"信息详情"
+        },
+        component:()=>import("../views/Info/detailed.vue") //局部区域显示的内容
       }
     ]
   },

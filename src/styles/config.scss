@@ -33,3 +33,9 @@ $layoutHeader:75px;
         margin-left: $width+px;
       }
 }
+
+
+//margin-left会有1-110偏移值去处理
+@for $i from 1 through 110 {
+    .margin-left-#{$i} {margin-left:(1px*$i);}
+}
