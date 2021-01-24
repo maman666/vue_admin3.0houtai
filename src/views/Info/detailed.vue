@@ -16,17 +16,8 @@
             <el-input v-model="form.title"></el-input>
         </el-form-item>
         <el-form-item label="缩列图：">
-          <!-- action 看空间命名的时候选的是哪个地区 这里选的是华南 :data属性额外附带的参数（token）-->
-          <el-upload
-            class="avatar-uploader"
-            action="http://up-z2.qiniup.com"
-            :data = "data.uploadKey"
-            :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload">
-            <img v-if="form.imageUrl" :src="form.imageUrl" class="avatar">
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-          </el-upload>
+          <!-- sync修饰符 -->
+          <UploadImg :imgUrl.sync="form.imageUrl" :config="uploadImgConfig"></UploadImg>
         </el-form-item>
 
         <el-form-item label="发布日期：">
@@ -46,8 +37,9 @@
 <script>
 import { reactive, ref, watch, onMounted } from "@vue/composition-api";
 import { GetList , EditInfo} from "@/api/news";
-import { QiniuToken } from "@/api/common";
 import { formatTime } from "@/utils/common";
+//引入上传图片组件
+import UploadImg from "@/components/UploadImg"
 //引入富文本编辑器
 import { quillEditor } from "vue-quill-editor"; 
 import 'quill/dist/quill.core.css';
@@ -56,17 +48,20 @@ import 'quill/dist/quill.bubble.css';
 
 export default {
   name: "infoDetailed",
-  components:{ quillEditor },
+  components:{ quillEditor,UploadImg },
   setup(props, { root }) {
+    //图片上传配置
+    const uploadImgConfig = reactive({
+      actions:"http://up-z2.qiniup.com",
+      ak:"qxHkFefAwpFGOS36rwHJMd2QmlCtrtypsPHrps36", //密钥ak
+      sk:"obOVCyY43Un3rCRHjW_gjp-3rASbBhc5ZCY4lE18",//密钥sk
+      buckety:"webvue3" //空间存储名
+    })
     const data = reactive({
       id:root.$route.params.id || root.$store.getters["infoDetailed/infoId"], //vuex 结合 HTML5本地储存 优势：参数不显示，劣势：微稍有点大材小用（解决第二种传参参数丢失）
       category: [], //拿取分类信息
       editorOption:{}, //富文本编辑
       submitLoading:false, //loading
-      uploadKey:{
-        token:"",//上传需要获取七牛云的token
-        key:"" //上传转码文件名
-      }
     });
     const form = reactive({
       categoryId: "",
@@ -113,58 +108,12 @@ export default {
                 form.title = responseData.title;
                 form.createTime = formatTime(responseData.createDate);
                 form.content = responseData.content;
-                form.imageUrl = responseData.imgUrl || 'http://qmcwn2x0a.hn-bkt.clouddn.com/2.jpg' || 'https://oss.tool.lu/cache/202101/10/182418p603tth2i62rzp6q.jpg.optim.jpg' //(一个月到时过期再改)
+                form.imageUrl = responseData.imgUrl || '' //'https://oss.tool.lu/cache/202101/10/182418p603tth2i62rzp6q.jpg.optim.jpg' //(一个月到时过期再改)
         }).catch(error=>{
 
         })
     }
 
-    //获取七牛云的token
-    const getQiniuToken = () =>{
-      let requestData = {
-        "ak":"qxHkFefAwpFGOS36rwHJMd2QmlCtrtypsPHrps36", //密钥ak
-        "sk":"obOVCyY43Un3rCRHjW_gjp-3rASbBhc5ZCY4lE18",//密钥sk
-        "buckety":"webvue3" //空间存储名称
-      }
-      QiniuToken(requestData).then(response=>{
-        data.uploadKey.token = response.data.data.token
-        console.log("token:",data.uploadKey.token)
-      }).catch(error=>{
-        console.log(error)
-      })
-    }
-
-    /**
-     * unload上传两个方法
-     * 
-     */
-    //上传成功就会来到这里
-    const  handleAvatarSuccess = (res, file) =>{
-      console.log('上传七牛云图片成功跑这里:',res)
-        //上传成功图片会有一个(线上)外部的链接地址 把它显示在页面上就可以了 这里的token出问题 不会跑这里
-        // form.imageUrl = `http://qmcwn2x0a.hn-bkt.clouddn.com/2.jpg`;
-        form.imageUrl = `${root.$store.getters["common/qiniuUrl"]}${res.key}`; //qmcwn2x0a.hn-bkt.clouddn.com七牛云的二级域名 这里是试用(一个月失效)
-      }
-    //上传前做的事情
-    const  beforeAvatarUpload = (file) => {
-        const isJPG = file.type === 'image/jpeg';
-        const isLt2M = file.size / 1024 / 1024 < 2;
-        // console.log(66669999,file)
-
-        if (!isJPG) {
-          root.$message.error('上传头像图片只能是 JPG 格式!');
-        }
-        if (!isLt2M) {
-          root.$message.error('上传头像图片大小不能超过 2MB!');
-        }
-
-        //文件名转码
-        let suffix = file.name;
-        let key = encodeURI(`${suffix}`);
-        data.uploadKey.key = key;
-
-        return isJPG && isLt2M;
-      }
 
     //点击保存调用的方法
     const submit = () => {
@@ -196,25 +145,21 @@ export default {
       getCategoryInfo();
       //获取编辑详情的单条信息记录
       getInfo();
-      //获取七牛云token
-      getQiniuToken();
-      
     });
 
     return {
       /** reactive*/
+      uploadImgConfig,
       data,
       form,
       /** methods*/
-      submit,
-      handleAvatarSuccess,
-      beforeAvatarUpload
+      submit
     };
   }
 };
 </script>
 
-<style scoped>
+<style lang="scss">
   .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
