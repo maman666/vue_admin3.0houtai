@@ -107,7 +107,7 @@ export default {
       getInfo();
     };
     const getInfo = ()=>{
-        //请求参数这两个参数时必须的，因为时编辑可以在在页面1，请求1条记录
+        //请求参数这两个参数时必须的，请求1条记录
         let requestData = {
             pageNumber: 1,
             pageSize: 1,

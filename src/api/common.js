@@ -1,5 +1,6 @@
 import { GetCategory,GetCategoryAll } from "@/api/news";
 import { reactive } from "@vue/composition-api";
+import service from '@/utils/request.js'
 
 export function common() {
     // 声明对象存数据
@@ -26,3 +27,12 @@ export function common() {
         getInfoCategoryAll
     }
 }
+
+ //获取七牛云token
+ export function QiniuToken (data){
+    return service.request({
+        method:"post",
+        url:"/uploadImgToken/",
+        data
+    })
+ }

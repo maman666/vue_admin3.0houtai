@@ -78,7 +78,7 @@
             @selection-change="handleSelectionChange"
         >
             <el-table-column type="selection" width="45"></el-table-column>
-            <el-table-column prop="title" label="标题" width="830"></el-table-column>
+            <el-table-column prop="title" label="标题" width="780"></el-table-column>
             <el-table-column prop="categoryId" label="类型" width="130" :formatter="handleCategory"></el-table-column>
             <el-table-column prop="createDate" label="日期" width="237" :formatter="handleTime"></el-table-column>
             <el-table-column prop="user" label="管理员" width="115"></el-table-column>
@@ -87,6 +87,10 @@
                 <template slot-scope="scope">
                     <el-button type="danger" size="mini" @click="deleteItem(scope.row.id)">删除</el-button>
                     <el-button type="success" size="mini" @click="editInfo(scope.row.id)">编辑</el-button>
+                    <!-- <router-link :to="{name:'infoDetailed', query:{id:scope.row.id,title:scope.row.title}}" class="margin-left-10">
+                       <el-button type="success" size="mini">编辑详情</el-button>
+                    </router-link> -->
+                    <el-button type="success" size="mini" @click="detailed(scope.row)">编辑详情</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -242,8 +246,6 @@ export default {
       }else{
           return categoryData[0].category_name
       }
-    //   console.log("categoryData:", categoryData[0]);
-    //   return categoryData[0].category_name;
     };
     /**
      *
@@ -362,6 +364,45 @@ export default {
     //         console.log(error)
     //     })
     // }
+
+    //点击跳转详情页
+    const detailed = (data)=>{
+      //vuex 存值得时候要看好在哪里存 这里刷新还是能拿到值得(预先存值)
+
+      //普通写法
+      // root.$store.commit('infoDetailed/SET_ID',data.id)
+      // root.$store.commit('infoDetailed/SET_TITLE',data.title)
+
+    //高级的写法
+    root.$store.commit('infoDetailed/UPDATE_STATE_VALUE',{
+      id:{
+        value:data.id,
+        sessionKey:"infoId",
+        session:true
+      },
+      title:{
+        value:data.title,
+        sessionKey:"infoTitle",
+        session:true
+      }
+    })
+
+
+      root.$router.push({
+        name:'infoDetailed',
+        // query:{ //明文传参 （ URL路径会显示传递的参数:优势：页面刷新参数不会丢失，劣势：参数公开）
+        //   id:data.id
+        // },
+        params:{ //密文传参  URL路径不会显示传递的参数:优势：参数不显示，劣势：页面刷新参数消失）
+          id:data.id,
+          title:data.title
+        }
+      })
+      // root.$router.push({
+      //   path:`/infoDetailed/${data.id}/${data.title}` //冒号的的形式传递传参 动态路由传参 (优势：页面刷新参数不会丢失，劣势：需要一一配置)
+      // })
+    }
+
     /**
      * 生命周期
      */
@@ -415,7 +456,8 @@ export default {
       handleSelectionChange,
       search,
       editInfo,
-      getListAddEdit
+      getListAddEdit,
+      detailed
     };
   }
 };
