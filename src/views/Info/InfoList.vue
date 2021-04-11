@@ -40,14 +40,7 @@
                 <div class="label-wrap key-work">
                     <label for="">关键字：&nbsp;&nbsp;</label>
                     <div class="wrap-content">
-                        <el-select v-model="search_key" placeholder="请选择" style="width:100%;">
-                            <el-option
-                                v-for="item in searchOptions"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                            ></el-option>
-                        </el-select>
+                        <SeleCtVue :config="searchOptions.configOption"></SeleCtVue>
                     </div>
                 </div>
             </el-col>
@@ -144,11 +137,15 @@ import DialogEditInfo from "./dialog/edit";
 import { global } from "@/utils/global_V3.0";
 import { formatTime } from "@/utils/common";
 import { common } from "@/api/common";
+//引入下拉菜单组件
+import SeleCtVue from "@/components/Select";
+
 export default {
   name: "infoList",
   components: {
     DialogInfo,
-    DialogEditInfo
+    DialogEditInfo,
+    SeleCtVue
   },
   /**
    * 数据
@@ -188,10 +185,10 @@ export default {
       pageSize: 10
     });
     //搜索关键字
-    const searchOptions = reactive([
-      { value: "id", label: "ID" },
-      { value: "title", label: "标题" }
-    ]);
+    const searchOptions = reactive({
+      //组件封装 采用配置的形式
+      configOption:["id","title"]
+    });
 
     //表格数据
     const tableData = reactive({

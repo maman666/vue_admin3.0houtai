@@ -7,9 +7,7 @@
                     <div class="warp-content">
                         <el-row :gutter="16">
                             <el-col :span="3">
-                                <el-select v-model="data.selectValue" placeholder="请选择">
-                                    <el-option v-for="item in data.option" :key="item.value" :value="item.value" :label="item.label"></el-option>
-                                </el-select>
+                                <SeleCtVue :config="data.configOption"></SeleCtVue>
                             </el-col>
                             <el-col :span="5">
                                 <el-input placeholder="请输入搜索关键字"></el-input>
@@ -30,25 +28,25 @@
 
 <script>
 import { reactive, ref, watch, onMounted } from "@vue/composition-api";
+//引入组件
+import SeleCtVue from "@/components/Select";
 export default {
-   name:"userList",
-   setup(props,{root}){
-       const data = reactive({
-           selectValue:"name",//这里输入value值 显示对应的label
-           option:[
-               {value:"name",label:"姓名"},
-               {value:"phone",label:"手机号"},
-               {value:"email",label:"邮箱"}
-            ],
-            
-       })
-       return {
-           data
-       }
-      
-   } 
-
-}
+  name: "userList",
+  //注册组件
+  components: { SeleCtVue },
+  setup(props, { root }) {
+    const data = reactive({
+        // 配置的东西一般用对象 扩展性强
+        // configOption:{
+        //     init:["name","phone","email"]
+        // },
+        configOption:["name","phone","email"]
+    });
+    return {
+      data
+    };
+  }
+};
 </script>
 
 <style lang="scss" scoped>
